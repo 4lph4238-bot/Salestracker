@@ -13,7 +13,7 @@ const pool = mysql.createPool({
   decimalNumbers: true, // return DECIMAL columns as JS numbers, not strings
   // Aiven (and most managed MySQL hosts) require SSL.
   // Set DB_SSL=true in your environment variables to enable it.
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: true } : undefined,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
 });
 
 module.exports = pool;
