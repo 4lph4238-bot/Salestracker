@@ -72,19 +72,30 @@ router.post('/', authenticate, async (req, res) => {
       });
     }
 
-    // Use staff-entered price if provided
-    // Minimum allowed = 25% of admin price (to allow quarter unit pricing)
-    const min_allowed_price = parseFloat(product.selling_price) * 0.25;
-    let actual_selling_price = parseFloat(product.selling_price);
+    // Pricing rule:
+    //   - Single-item sales (qty <= 1) MUST be at the admin-set selling_price.
+    //     No discount, no staff-entered price below it is allowed.
+    //   - Multi-unit sales (qty > 1) allow staff to enter ANY price (bulk
+    //     discount), since buying in bulk is expected to be cheaper.
+    const adminPrice = parseFloat(product.selling_price);
+    let actual_selling_price = adminPrice;
 
-    if (sale_price) {
-      const entered = parseFloat(sale_price);
-      if (entered < min_allowed_price) {
-        return res.status(400).json({
-          message: `Price too low. Minimum allowed is ${min_allowed_price.toFixed(2)} (25% of admin price)`
-        });
+    if (qty <= 1) {
+      // Single item: ignore/reject any lower staff-entered price.
+      if (sale_price) {
+        const entered = parseFloat(sale_price);
+        if (entered < adminPrice) {
+          return res.status(400).json({
+            message: `Cannot sell a single unit below the set price of ${adminPrice.toFixed(2)}.`,
+          });
+        }
+        actual_selling_price = entered; // allow entering a higher price, just not lower
       }
-      actual_selling_price = entered;
+    } else {
+      // Multiple units: staff can freely discount.
+      if (sale_price) {
+        actual_selling_price = parseFloat(sale_price);
+      }
     }
 
     // Total revenue = (price per unit × quantity) - discount
