@@ -164,12 +164,19 @@ router.get('/months', authenticate, adminOnly, async (req, res) => {
   try {
     const [months] = await db.query(
       `SELECT YEAR(sale_date) AS year, MONTH(sale_date) AS month,
-              LPAD(MONTH(sale_date),2,'0') AS month_pad,
               COUNT(*) AS total_sales
        FROM sales GROUP BY YEAR(sale_date), MONTH(sale_date)
        ORDER BY year DESC, month DESC`
     );
-    res.json({ months: months.map(m => ({ ...m, month: m.month_pad })) });
+    // Zero-pad the month in JS instead of SQL (LPAD on a function-of-a-
+    // grouped-column tripped MySQL's strict ONLY_FULL_GROUP_BY mode on Aiven).
+    res.json({
+      months: months.map(m => ({
+        year: m.year,
+        month: String(m.month).padStart(2, '0'),
+        total_sales: m.total_sales,
+      })),
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error.' });
