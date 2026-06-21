@@ -26,7 +26,7 @@ router.get('/dashboard', authenticate, adminOnly, async (req, res) => {
     const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01 00:00:00`;
 
     const [salesStats] = await db.query(
-      `SELECT 
+      `SELECT
          COALESCE(SUM(CASE WHEN is_settled = 1 THEN total_revenue ELSE 0 END), 0) AS total_revenue,
          COALESCE(SUM(CASE WHEN is_settled = 1 THEN profit ELSE 0 END), 0) AS total_profit,
          ROUND((COALESCE(SUM(CASE WHEN is_settled = 1 THEN profit ELSE 0 END), 0) / NULLIF(COALESCE(SUM(CASE WHEN is_settled = 1 THEN total_revenue ELSE 0 END), 0), 0)) * 100, 2) AS profit_margin_percent,
@@ -87,7 +87,7 @@ router.get('/sales', authenticate, adminOnly, async (req, res) => {
     }
 
     const [summary] = await db.query(
-      `SELECT 
+      `SELECT
          COUNT(*) AS total_transactions,
          COALESCE(SUM(quantity_sold), 0) AS total_units_sold,
          COALESCE(SUM(CASE WHEN is_settled = 1 THEN total_revenue ELSE 0 END), 0) AS total_revenue,
@@ -147,7 +147,10 @@ router.get('/dates', authenticate, adminOnly, async (req, res) => {
   try {
     const [dates] = await db.query(
       `SELECT DATE_FORMAT(sale_date, '%Y-%m-%d') AS date, COUNT(*) AS total_sales
-       FROM sales GROUP BY DATE(sale_date) ORDER BY DATE(sale_date) DESC LIMIT 90`
+       FROM sales
+       GROUP BY DATE_FORMAT(sale_date, '%Y-%m-%d')
+       ORDER BY DATE_FORMAT(sale_date, '%Y-%m-%d') DESC
+       LIMIT 90`
     );
     res.json({ dates });
   } catch (err) {
