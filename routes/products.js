@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const { authenticate, adminOnly } = require('../middleware/auth');
+const allowedUnits = new Set(['kg', 'piece', 'bag']);
+const unitLabel = (unit) => ({ kg: 'kg', piece: 'pieces', bag: 'bags' }[unit] || 'pieces');
 
 // GET /api/products — View all products (both roles)
 router.get('/', authenticate, async (req, res) => {
   try {
     const [products] = await db.query(
-      'SELECT id, name, stock_quantity, min_stock_limit, cost_price, selling_price, updated_at FROM products ORDER BY name ASC'
+      'SELECT id, name, unit_type, stock_quantity, min_stock_limit, cost_price, selling_price, updated_at FROM products ORDER BY name ASC'
     );
 
     // Attach low stock flag and notification alerts
@@ -28,7 +30,7 @@ router.get('/', authenticate, async (req, res) => {
 router.get('/low-stock', authenticate, adminOnly, async (req, res) => {
   try {
     const [products] = await db.query(
-      'SELECT id, name, stock_quantity, min_stock_limit FROM products WHERE stock_quantity <= min_stock_limit ORDER BY stock_quantity ASC'
+      'SELECT id, name, unit_type, stock_quantity, min_stock_limit FROM products WHERE stock_quantity <= min_stock_limit ORDER BY stock_quantity ASC'
     );
 
     res.json({
@@ -48,6 +50,7 @@ router.get('/low-stock', authenticate, adminOnly, async (req, res) => {
 // POST /api/products — Add new product (admin only)
 router.post('/', authenticate, adminOnly, async (req, res) => {
   const { name, stock_quantity, min_stock_limit, cost_price, selling_price } = req.body;
+  const unit_type = req.body.unit_type || 'piece';
 
   if (!name || stock_quantity == null || !cost_price || !selling_price) {
     return res.status(400).json({ message: 'All fields are required.' });
@@ -56,11 +59,14 @@ router.post('/', authenticate, adminOnly, async (req, res) => {
   if (selling_price <= cost_price) {
     return res.status(400).json({ message: 'Selling price must be greater than cost price.' });
   }
+  if (!allowedUnits.has(unit_type)) {
+    return res.status(400).json({ message: 'Unit must be kg, piece, or bag.' });
+  }
 
   try {
     const [result] = await db.query(
-      'INSERT INTO products (name, stock_quantity, min_stock_limit, cost_price, selling_price) VALUES (?, ?, ?, ?, ?)',
-      [name, stock_quantity, min_stock_limit || 5, cost_price, selling_price]
+      'INSERT INTO products (name, unit_type, stock_quantity, min_stock_limit, cost_price, selling_price) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, unit_type, stock_quantity, min_stock_limit || 5, cost_price, selling_price]
     );
 
     const isLowStock = stock_quantity <= (min_stock_limit || 5);
@@ -80,16 +86,20 @@ router.post('/', authenticate, adminOnly, async (req, res) => {
 // PUT /api/products/:id — Update product stock/details (admin only)
 router.put('/:id', authenticate, adminOnly, async (req, res) => {
   const { id } = req.params;
-  const { name, stock_quantity, min_stock_limit, cost_price, selling_price } = req.body;
+  const { name, unit_type, stock_quantity, min_stock_limit, cost_price, selling_price } = req.body;
 
   try {
     const [existing] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
     if (existing.length === 0) {
       return res.status(404).json({ message: 'Product not found.' });
     }
+    if (unit_type != null && !allowedUnits.has(unit_type)) {
+      return res.status(400).json({ message: 'Unit must be kg, piece, or bag.' });
+    }
 
     const updated = {
       name: name ?? existing[0].name,
+      unit_type: unit_type ?? existing[0].unit_type ?? 'piece',
       stock_quantity: stock_quantity ?? existing[0].stock_quantity,
       min_stock_limit: min_stock_limit ?? existing[0].min_stock_limit,
       cost_price: cost_price ?? existing[0].cost_price,
@@ -97,8 +107,8 @@ router.put('/:id', authenticate, adminOnly, async (req, res) => {
     };
 
     await db.query(
-      'UPDATE products SET name=?, stock_quantity=?, min_stock_limit=?, cost_price=?, selling_price=? WHERE id=?',
-      [updated.name, updated.stock_quantity, updated.min_stock_limit, updated.cost_price, updated.selling_price, id]
+      'UPDATE products SET name=?, unit_type=?, stock_quantity=?, min_stock_limit=?, cost_price=?, selling_price=? WHERE id=?',
+      [updated.name, updated.unit_type, updated.stock_quantity, updated.min_stock_limit, updated.cost_price, updated.selling_price, id]
     );
 
     const isLowStock = updated.stock_quantity <= updated.min_stock_limit;
@@ -107,7 +117,7 @@ router.put('/:id', authenticate, adminOnly, async (req, res) => {
       message: 'Product updated successfully.',
       low_stock_alert: isLowStock,
       alert_message: isLowStock
-        ? `⚠️ Restock Alert: "${updated.name}" has only ${updated.stock_quantity} unit(s) left. Minimum is ${updated.min_stock_limit}.`
+        ? `⚠️ Restock Alert: "${updated.name}" has only ${updated.stock_quantity} ${unitLabel(updated.unit_type)} left. Minimum is ${updated.min_stock_limit}.`
         : null,
     });
   } catch (err) {

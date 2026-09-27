@@ -43,7 +43,7 @@ router.get('/dashboard', authenticate, adminOnly, async (req, res) => {
     const [totalProducts] = await db.query(`SELECT COUNT(*) AS total_products FROM products`);
 
     const [recentSales] = await db.query(
-      `SELECT s.id, COALESCE(p.name, 'Deleted Product') AS product, u.name AS sold_by,
+      `SELECT s.id, COALESCE(p.name, 'Deleted Product') AS product, COALESCE(p.unit_type, 'piece') AS unit_type, u.name AS sold_by,
               s.quantity_sold, s.total_revenue, s.payment_type, s.is_settled, s.sale_date
        FROM sales s
        LEFT JOIN products p ON s.product_id = p.id
@@ -99,17 +99,31 @@ router.get('/sales', authenticate, adminOnly, async (req, res) => {
       params
     );
 
+    const [quantityByUnit] = await db.query(
+      `SELECT
+         COALESCE(SUM(CASE WHEN COALESCE(p.unit_type, 'piece') = 'kg' THEN s.quantity_sold ELSE 0 END), 0) AS kg,
+         COALESCE(SUM(CASE WHEN COALESCE(p.unit_type, 'piece') = 'piece' THEN s.quantity_sold ELSE 0 END), 0) AS pieces,
+         COALESCE(SUM(CASE WHEN COALESCE(p.unit_type, 'piece') = 'bag' THEN s.quantity_sold ELSE 0 END), 0) AS bags
+       FROM sales s LEFT JOIN products p ON s.product_id = p.id
+       ${whereClause}`,
+      params
+    );
+
     const [byProduct] = await db.query(
-      `SELECT COALESCE(p.name, 'Deleted Product') AS product, SUM(s.quantity_sold) AS units_sold,
+      `SELECT COALESCE(p.name, 'Deleted Product') AS product, COALESCE(p.unit_type, 'piece') AS unit_type, SUM(s.quantity_sold) AS units_sold,
               SUM(CASE WHEN s.is_settled = 1 THEN s.total_revenue ELSE 0 END) AS revenue,
               SUM(CASE WHEN s.is_settled = 1 THEN s.profit ELSE 0 END) AS profit
        FROM sales s LEFT JOIN products p ON s.product_id = p.id
        ${whereClause}
-       GROUP BY s.product_id, p.name ORDER BY revenue DESC`,
+      GROUP BY s.product_id, p.name, p.unit_type ORDER BY revenue DESC`,
       params
     );
 
-    res.json({ period, summary: summary[0], by_product: byProduct });
+    res.json({
+      period,
+      summary: { ...summary[0], quantity_by_unit: quantityByUnit[0] },
+      by_product: byProduct,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error.' });

@@ -6,6 +6,8 @@ const { authenticate } = require('../middleware/auth');
 // How much of a loan must be paid on the date of purchase for the sale's
 // revenue/profit to count immediately in reports (0-1). Configurable via .env.
 const LOAN_SETTLEMENT_THRESHOLD = parseFloat(process.env.LOAN_SETTLEMENT_THRESHOLD || '0.5');
+const unitLabel = (unit) => ({ kg: 'kg', piece: 'pieces', bag: 'bags' }[unit] || 'pieces');
+const unitPriceLabel = (unit) => ({ kg: 'kg', piece: 'piece', bag: 'bag' }[unit] || 'piece');
 
 // POST /api/sales — Record a sale (both admin and user)
 // Supports two payment types:
@@ -68,7 +70,7 @@ router.post('/', authenticate, async (req, res) => {
 
     if (parseFloat(product.stock_quantity) < qty) {
       return res.status(400).json({
-        message: `Not enough stock. Only ${product.stock_quantity} unit(s) available.`,
+        message: `Not enough stock. Only ${product.stock_quantity} ${unitLabel(product.unit_type)} available.`,
       });
     }
 
@@ -86,7 +88,7 @@ router.post('/', authenticate, async (req, res) => {
         const entered = parseFloat(sale_price);
         if (entered < adminPrice) {
           return res.status(400).json({
-            message: `Cannot sell a single unit below the set price of ${adminPrice.toFixed(2)}.`,
+            message: `Cannot sell a quantity below the set price of ${adminPrice.toFixed(2)} per ${unitPriceLabel(product.unit_type)}.`,
           });
         }
         actual_selling_price = entered; // allow entering a higher price, just not lower
@@ -149,7 +151,7 @@ router.post('/', authenticate, async (req, res) => {
       is_settled: !!is_settled,
       low_stock_alert: isLowStock,
       alert_message: isLowStock
-        ? `⚠️ Restock Alert: "${product.name}" is running low — only ${new_stock} unit(s) remaining!`
+        ? `⚠️ Restock Alert: "${product.name}" is running low — only ${new_stock} ${unitLabel(product.unit_type)} remaining!`
         : null,
     });
   } catch (err) {
@@ -162,7 +164,7 @@ router.post('/', authenticate, async (req, res) => {
 router.get('/', authenticate, async (req, res) => {
   try {
     const [sales] = await db.query(
-      `SELECT s.id, COALESCE(p.name, 'Deleted Product') AS product, u.name AS sold_by, s.quantity_sold,
+      `SELECT s.id, COALESCE(p.name, 'Deleted Product') AS product, COALESCE(p.unit_type, 'piece') AS unit_type, u.name AS sold_by, s.quantity_sold,
               s.selling_price, s.total_revenue, s.profit, s.payment_type, s.is_settled, s.sale_date
        FROM sales s
        LEFT JOIN products p ON s.product_id = p.id

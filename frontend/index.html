@@ -225,6 +225,14 @@
                                         <input type="number" id="prodMin" min="1" class="w-full p-2 border rounded" required="">
                                     </div>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="unitType">Unit of measure</label>
+                                    <select id="prodUnit" class="w-full p-2 border rounded">
+                                        <option value="kg" data-i18n="unitKgOption">Kilograms (kg)</option>
+                                        <option value="piece" data-i18n="unitPieceOption" selected>Pieces</option>
+                                        <option value="bag" data-i18n="unitBagOption">Bags</option>
+                                    </select>
+                                </div>
                                 <button type="submit" id="prodBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded transition" data-i18n="saveProduct">Save Product</button>
                             </form>
                         </div>
@@ -235,6 +243,14 @@
                                 <div class="mb-3">
                                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="selectProduct">Select Product</label>
                                     <select id="restockProduct" class="w-full p-2 border rounded" required=""></select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="unitType">Unit of measure</label>
+                                    <select id="restockUnit" class="w-full p-2 border rounded" onchange="updateRestockUnitPreview()">
+                                        <option value="kg" data-i18n="unitKgOption">Kilograms (kg)</option>
+                                        <option value="piece" data-i18n="unitPieceOption" selected>Pieces</option>
+                                        <option value="bag" data-i18n="unitBagOption">Bags</option>
+                                    </select>
                                 </div>
                                 <div class="mb-3 p-3 bg-gray-50 rounded border text-sm text-gray-600">
                                     <p><span data-i18n="currentStock">Current stock:</span> <span id="currentStockDisplay" class="font-bold text-gray-800">—</span></p>
@@ -428,9 +444,12 @@
                 signIn: 'Sign In', signingIn: 'Signing in...', broughtBy: 'Brought to you by',
                 users: '👥 Users', logout: 'Logout', restockWarning: '⚠️ Restock Warning',
                 recordSale: 'Record New Sale', selectProduct: 'Select Product', quantitySold: 'Quantity Sold',
-                wholeUnits: 'Whole units', fraction: '+ fraction:', none: 'None', quantity: 'Quantity: {value}',
-                quantityHint: 'Quantity: 0 (enter a whole number or select a fraction)', units: '{value} unit(s)',
-                actualSellingPrice: 'Actual Selling Price (Tshs per unit)', minPerUnit: 'Min per unit:',
+                wholeUnits: 'Whole quantity', fraction: '+ fraction:', none: 'None', quantity: 'Quantity: {value}',
+                quantityHint: 'Quantity: 0 (enter a whole quantity or select a fraction)', units: '{value} pieces',
+                unitType: 'Unit of measure', unitKgOption: 'Kilograms (kg)', unitPieceOption: 'Pieces', unitBagOption: 'Bags',
+                unitKg: 'kg', unitPieces: 'pieces', unitBags: 'bags', unitPieceSingular: 'piece', unitBagSingular: 'bag', quantityCount: '{count} {unit}',
+                unitChangeConfirm: 'Changing the unit relabels current stock and the minimum stock limit for "{name}". Continue?', unitUpdated: '✅ Unit updated for "{name}" to {unit}.',
+                actualSellingPrice: 'Actual Selling Price (Tshs per {unit})', minPerUnit: 'Minimum per {unit}:',
                 discount: 'Discount (Tshs)', optional: '— optional', discountPlaceholder: 'Enter discount amount',
                 paymentType: 'Payment Type', cash: 'Cash', loanCredit: 'Loan (Credit)',
                 loanExplanation: 'Customer is taking goods on credit. Stock will be reduced now; revenue/profit only count once the loan is settled.',
@@ -440,20 +459,19 @@
                 totalOwedPlaceholder: 'Total owed', submitSale: 'Submit Sale', processing: 'Processing...',
                 adminStock: 'Admin: Stock Management', addNew: 'Add New', restock: 'Restock', productName: 'Product Name',
                 cost: 'Cost (Tshs)', selling: 'Selling (Tshs)', initialStock: 'Initial Stock', minLimit: 'Min Limit',
-                saveProduct: 'Save Product', saving: 'Saving...', currentStock: 'Current stock:', unitsToAdd: 'Units to Add',
+                saveProduct: 'Save Product', saving: 'Saving...', currentStock: 'Current stock:', unitsToAdd: 'Quantity to Add',
                 restockOptional: '(optional — enter 0 if only updating price)', updatePrices: 'Update Prices (optional)',
                 newCost: 'New Cost (Tshs)', newSelling: 'New Selling (Tshs)', leaveBlank: 'Leave blank to keep',
                 keepPricesHint: '💡 Leave blank to keep existing prices', addStock: 'Add Stock',
                 stockBalance: 'Current Stock Balance', searchProduct: '🔍 Search product...', product: 'Product',
                 stockAvailable: 'Stock Available', costPrice: 'Cost Price', sellingPrice: 'Selling Price',
                 status: 'Status', action: 'Action', loading: 'Loading...', noProducts: 'No products found.',
-                lowStock: 'Low Stock', good: 'Good', delete: 'Delete', unitsInStock: '{count} in stock', unitsCount: '{count} units',
-                productMinOption: '{name} (min: {displayPrice})', productStockOption: '{name} ({count} in stock)',
+                lowStock: 'Low Stock', good: 'Good', delete: 'Delete', unitsInStock: '{count} in stock', unitsCount: '{count} units', zeroQuantity: '0',
+                productMinOption: '{name} ({unit}; min: {displayPrice})', productStockOption: '{name} ({count} {unit} in stock)',
                 minimumStockAlert: 'Attention: [ {products} ] have dropped below minimum thresholds. Please restock.',
                 financialReports: 'Financial Reports & Profit Rates', currentMonthStats: 'Main stats show current month:',
                 adminMode: 'Admin Mode', thisMonthRevenue: 'This Month Revenue', thisMonthProfit: 'This Month Profit',
                 profitMargin: 'Profit Rate Margin', reportPeriod: 'Generate Sales Report Period:', daily: 'Daily',
-                perUnit: 'per unit',
                 monthly: 'Monthly', annually: 'Annually', selectDateReport: "Select a date to view that day's report:",
                 selectMonthReport: "Select a month to view that month's report:", loansTitle: 'Outstanding Loans (Goods on Credit)',
                 customer: 'Customer', totalOwed: 'Total Owed', balanceDue: 'Balance Due', dueDate: 'Due Date',
@@ -467,30 +485,30 @@
                 removeStaffConfirm: 'Remove staff account for "{name}"?', allRightsReserved: '— All rights reserved', poweredBy: 'Powered by',
                 failedLoadInventory: 'Failed to load inventory.', noSales: 'No sales recorded yet.', failedLoadDates: 'Failed to load dates.',
                 failedLoadMonths: 'Failed to load months.', generatingReport: 'Generating {period} report...',
-                generatingAnnual: 'Generating annual report...', failed: 'Failed:', transactions: 'Transactions', unitsSold: 'Units Sold',
+                generatingAnnual: 'Generating annual report...', failed: 'Failed:', transactions: 'Transactions', unitsSold: 'Quantity Sold',
                 revenue: 'Revenue', profit: 'Profit', byProduct: 'By Product:', deletedProduct: 'Deleted product',
                 noSalesPeriod: 'No sales in this period.', salesCount: '{count} sale(s)', report: 'Report', annualReport: 'ANNUAL Report',
                 semiAnnualReport: 'SEMI-ANNUALLY Report', dailyReport: 'Daily', monthlyReport: 'Monthly',
                 dailyReportTitle: '📅 Daily — {date}', monthlyReportTitle: '📅 Monthly — {month}', annualReportTitle: '📊 ANNUAL Report — {year}',
-                quantityBreakdown: 'Quantity: {whole}{fraction} = {total} unit(s)',
+                quantityBreakdown: 'Quantity: {whole}{fraction} = {total} {unit}',
                 loanDueTomorrow: '⏰ Loan repayment due tomorrow: {items}', loanBalance: 'balance {amount}',
                 loanAlertItem: '{customer} ({product}) — balance {amount}',
                 saleQuantityError: '❌ Please enter a quantity or select a fraction.',
-                salePriceError: '❌ Price too low. Minimum allowed is {amount}',
+                salePriceError: '❌ Price too low. Minimum allowed is {amount} per {unit}',
                 loanCustomerError: "❌ Please enter the customer's name for a loan sale.",
                 loanDatesError: '❌ Please set both the date loaned and date to be paid.',
                 loanTotalError: '❌ Please enter the total amount to be paid.',
                 loanPaidError: '❌ Amount paid cannot exceed the amount to be paid.',
-                saleRecorded: '✅ Sale: {quantity} unit(s) × {price}{discount} = {total}',
-                loanSaleRecorded: '✅ Loan sale: {quantity} unit(s) recorded for {customer}.',
+                saleRecorded: '✅ Sale: {quantity} {unit} × {price} per {unit}{discount} = {total}',
+                loanSaleRecorded: '✅ Loan sale: {quantity} {unit} recorded for {customer}.',
                 discountDetail: ' (discount: {amount})', productAdded: '✅ Product "{name}" added!',
                 selectProductError: 'Please select a product.', updateStockError: 'Please add units or update a price.',
-                stockAddedAndPrices: '✅ Added {quantity} units & prices updated for "{name}"!',
-                stockAdded: '✅ Added {quantity} units to "{name}". New stock: {stock}', pricesUpdated: '✅ Prices updated for "{name}"!',
+                stockAddedAndPrices: '✅ Added {quantity} {unit} & prices updated for "{name}"!',
+                stockAdded: '✅ Added {quantity} {unit} to "{name}". New stock: {stock}', pricesUpdated: '✅ Prices updated for "{name}"!',
                 validAmountError: '❌ Please enter a valid positive amount.', staffCreated: '✅ Staff account created for {name}!',
                 staffRemoved: '✅ "{name}" removed.', passwordUpdated: '✅ Password updated successfully!',
                 deletedSuccessfully: '✅ "{name}" deleted successfully.', enterPositiveAmount: '❌ Please enter a valid positive amount.',
-                pricePerUnit: '{quantity} unit(s) × {price} per unit = {total}',
+                pricePerUnit: '{quantity} × {price} per {unit} = {total}',
                 finalTotal: '{subtotal} − discount {discount} = Final Total: {total}',
                 loginSuccess: 'Login successful.', serverError: 'Server error.'
             },
@@ -504,9 +522,13 @@
                 signIn: 'Ingia', signingIn: 'Inaingia...', broughtBy: 'Imetolewa kwako na',
                 users: '👥 Watumiaji', logout: 'Toka', restockWarning: '⚠️ Onyo la Kuongeza Bidhaa',
                 recordSale: 'Rekodi Mauzo Mapya', selectProduct: 'Chagua Bidhaa', quantitySold: 'Kiasi Kilichouzwa',
-                wholeUnits: 'Idadi kamili', fraction: '+ sehemu:', none: 'Hakuna', quantity: 'Kiasi: {value}', units: 'vipande {value}',
-                quantityHint: 'Kiasi: 0 (weka idadi kamili au chagua sehemu)', actualSellingPrice: 'Bei Halisi ya Kuuza (Tsh kwa kipande)',
-                minPerUnit: 'Bei ya chini kwa kipande:', discount: 'Punguzo (Tsh)', optional: '— si lazima',
+                wholeUnits: 'Kiasi kizima', fraction: '+ sehemu:', none: 'Hakuna', quantity: 'Kiasi: {value}', units: 'vipande {value}',
+                quantityHint: 'Kiasi: 0 (weka kiasi kizima au chagua sehemu)',
+                unitType: 'Kipimo', unitKgOption: 'Kilo (kg)', unitPieceOption: 'Vipande', unitBagOption: 'Mifuko',
+                unitKg: 'kg', unitPieces: 'vipande', unitBags: 'mifuko', unitPieceSingular: 'kipande', unitBagSingular: 'mfuko', quantityCount: '{count} {unit}',
+                unitChangeConfirm: 'Kubadilisha kipimo kutabadilisha kipimo cha stoo ya sasa na kiwango cha chini cha "{name}". Uendelee?', unitUpdated: '✅ Kipimo cha "{name}" kimebadilishwa kuwa {unit}.',
+                actualSellingPrice: 'Bei Halisi ya Kuuza (Tsh kwa {unit})', minPerUnit: 'Bei ya chini kwa {unit}:',
+                discount: 'Punguzo (Tsh)', optional: '— si lazima',
                 discountPlaceholder: 'Weka kiasi cha punguzo', paymentType: 'Aina ya Malipo', cash: 'Taslimu', loanCredit: 'Mkopo',
                 loanExplanation: 'Mteja anachukua bidhaa kwa mkopo. Bidhaa zitatoka stoo sasa; mapato na faida vitahesabiwa mkopo utakapolipwa.',
                 customerName: 'Jina la Mteja', customerNamePlaceholder: 'mfano: Jane Doe', dateLoaned: 'Tarehe ya Kukopa',
@@ -515,20 +537,19 @@
                 totalOwedPlaceholder: 'Jumla ya deni', submitSale: 'Wasilisha Mauzo', processing: 'Inachakata...',
                 adminStock: 'Msimamizi: Usimamizi wa Stoo', addNew: 'Ongeza Mpya', restock: 'Ongeza Stoo', productName: 'Jina la Bidhaa',
                 cost: 'Gharama (Tsh)', selling: 'Bei ya Kuuza (Tsh)', initialStock: 'Bidhaa za Kuanza', minLimit: 'Kiwango cha Chini',
-                saveProduct: 'Hifadhi Bidhaa', saving: 'Inahifadhi...', currentStock: 'Stoo ya sasa:', unitsToAdd: 'Idadi ya Kuongeza',
+                saveProduct: 'Hifadhi Bidhaa', saving: 'Inahifadhi...', currentStock: 'Stoo ya sasa:', unitsToAdd: 'Kiasi cha Kuongeza',
                 restockOptional: '(si lazima — weka 0 ikiwa unasasisha bei pekee)', updatePrices: 'Sasisha Bei (si lazima)',
                 newCost: 'Gharama Mpya (Tsh)', newSelling: 'Bei Mpya ya Kuuza (Tsh)', leaveBlank: 'Acha wazi ili isibadilike',
                 keepPricesHint: '💡 Acha wazi ili kuhifadhi bei za sasa', addStock: 'Ongeza Bidhaa Stooni',
                 stockBalance: 'Hali ya Bidhaa Stooni', searchProduct: '🔍 Tafuta bidhaa...', product: 'Bidhaa',
                 stockAvailable: 'Bidhaa Zilizopo', costPrice: 'Bei ya Gharama', sellingPrice: 'Bei ya Kuuza',
                 status: 'Hali', action: 'Kitendo', loading: 'Inapakia...', noProducts: 'Hakuna bidhaa zilizopatikana.',
-                lowStock: 'Bidhaa Chache', good: 'Inatosha', delete: 'Futa', unitsInStock: '{count} stooni',
-                unitsCount: 'vipande {count}', productMinOption: '{name} (bei ya chini: {displayPrice})', productStockOption: '{name} ({count} stooni)',
+                lowStock: 'Bidhaa Chache', good: 'Inatosha', delete: 'Futa', unitsInStock: '{count} stooni', zeroQuantity: '0',
+                unitsCount: 'vipande {count}', productMinOption: '{name} ({unit}; bei ya chini: {displayPrice})', productStockOption: '{name} ({count} {unit} stooni)',
                 minimumStockAlert: 'Tahadhari: [ {products} ] zimeshuka chini ya kiwango cha chini. Tafadhali ongeza bidhaa stooni.',
                 financialReports: 'Ripoti za Fedha na Viwango vya Faida', currentMonthStats: 'Takwimu kuu zinaonyesha mwezi huu:',
                 adminMode: 'Hali ya Msimamizi', thisMonthRevenue: 'Mapato ya Mwezi Huu', thisMonthProfit: 'Faida ya Mwezi Huu',
                 profitMargin: 'Asilimia ya Faida', reportPeriod: 'Tengeneza Ripoti ya Mauzo kwa Kipindi:', daily: 'Kila Siku',
-                perUnit: 'kwa kipande',
                 monthly: 'Kila Mwezi', annually: 'Kila Mwaka', selectDateReport: 'Chagua tarehe kuona ripoti ya siku hiyo:',
                 selectMonthReport: 'Chagua mwezi kuona ripoti ya mwezi huo:', loansTitle: 'Mikopo Inayosubiri (Bidhaa za Mkopo)',
                 customer: 'Mteja', totalOwed: 'Jumla ya Deni', balanceDue: 'Salio la Kulipa', dueDate: 'Tarehe ya Kulipa',
@@ -543,30 +564,30 @@
                 failedLoadInventory: 'Imeshindikana kupakia bidhaa stooni.', noSales: 'Bado hakuna mauzo yaliyorekodiwa.',
                 failedLoadDates: 'Imeshindikana kupakia tarehe.', failedLoadMonths: 'Imeshindikana kupakia miezi.',
                 generatingReport: 'Inatengeneza ripoti ya {period}...', generatingAnnual: 'Inatengeneza ripoti ya mwaka...',
-                failed: 'Imeshindikana:', transactions: 'Miamala', unitsSold: 'Vipande Vilivyouzwa', revenue: 'Mapato', profit: 'Faida',
+                failed: 'Imeshindikana:', transactions: 'Miamala', unitsSold: 'Kiasi Kilichouzwa', revenue: 'Mapato', profit: 'Faida',
                 byProduct: 'Kwa Bidhaa:', deletedProduct: 'Bidhaa iliyofutwa', noSalesPeriod: 'Hakuna mauzo katika kipindi hiki.',
                 salesCount: 'mauzo {count}', report: 'Ripoti', annualReport: 'Ripoti ya MWAKA', semiAnnualReport: 'Ripoti ya NUSU MWAKA',
                 dailyReport: 'Kila Siku', monthlyReport: 'Kila Mwezi',
                 dailyReportTitle: '📅 Siku — {date}', monthlyReportTitle: '📅 Mwezi — {month}', annualReportTitle: '📊 Ripoti ya MWAKA — {year}',
-                quantityBreakdown: 'Kiasi: {whole}{fraction} = vipande {total}', loanDueTomorrow: '⏰ Malipo ya mkopo yanatarajiwa kesho: {items}',
+                quantityBreakdown: 'Kiasi: {whole}{fraction} = {total} {unit}', loanDueTomorrow: '⏰ Malipo ya mkopo yanatarajiwa kesho: {items}',
                 loanBalance: 'salio {amount}', loanAlertItem: '{customer} ({product}) — salio {amount}',
                 saleQuantityError: '❌ Tafadhali weka kiasi au chagua sehemu ya kipande.',
-                salePriceError: '❌ Bei ni ndogo mno. Bei ya chini inayokubalika ni {amount}',
+                salePriceError: '❌ Bei ni ndogo mno. Bei ya chini inayokubalika ni {amount} kwa {unit}',
                 loanCustomerError: '❌ Tafadhali weka jina la mteja wa mauzo ya mkopo.',
                 loanDatesError: '❌ Tafadhali weka tarehe ya kukopa na tarehe ya kulipa.',
                 loanTotalError: '❌ Tafadhali weka jumla ya kiasi cha kulipwa.',
                 loanPaidError: '❌ Kiasi kilicholipwa hakiwezi kuzidi kiasi cha kulipwa.',
-                saleRecorded: '✅ Mauzo: vipande {quantity} × {price}{discount} = {total}',
-                loanSaleRecorded: '✅ Mauzo ya mkopo: vipande {quantity} vimerekodiwa kwa {customer}.',
+                saleRecorded: '✅ Mauzo: {quantity} {unit} × {price} kwa {unit}{discount} = {total}',
+                loanSaleRecorded: '✅ Mauzo ya mkopo: {quantity} {unit} vimerekodiwa kwa {customer}.',
                 discountDetail: ' (punguzo: {amount})', productAdded: '✅ Bidhaa "{name}" imeongezwa!',
                 selectProductError: 'Tafadhali chagua bidhaa.', updateStockError: 'Tafadhali ongeza bidhaa au sasisha bei.',
-                stockAddedAndPrices: '✅ Vipande {quantity} vimeongezwa na bei za "{name}" zimesasishwa!',
-                stockAdded: '✅ Vipande {quantity} vimeongezwa kwa "{name}". Stoo mpya: {stock}',
+                stockAddedAndPrices: '✅ {quantity} {unit} vimeongezwa na bei za "{name}" zimesasishwa!',
+                stockAdded: '✅ {quantity} {unit} vimeongezwa kwa "{name}". Stoo mpya: {stock}',
                 pricesUpdated: '✅ Bei za "{name}" zimesasishwa!', validAmountError: '❌ Tafadhali weka kiasi halali kilicho zaidi ya sifuri.',
                 staffCreated: '✅ Akaunti ya mfanyakazi {name} imefunguliwa!', staffRemoved: '✅ "{name}" ameondolewa.',
                 passwordUpdated: '✅ Nenosiri limesasishwa kikamilifu!', deletedSuccessfully: '✅ "{name}" imefutwa kikamilifu.',
                 enterPositiveAmount: '❌ Tafadhali weka kiasi halali kilicho zaidi ya sifuri.',
-                pricePerUnit: 'Vipande {quantity} × {price} kwa kipande = {total}',
+                pricePerUnit: 'Kiasi {quantity} × {price} kwa {unit} = {total}',
                 finalTotal: '{subtotal} − punguzo {discount} = Jumla ya Mwisho: {total}',
                 loginSuccess: 'Umeingia kikamilifu.', serverError: 'Hitilafu ya seva.'
             }
@@ -596,6 +617,7 @@
                     'amount paid cannot exceed the amount to be paid.': 'Amount paid cannot exceed the amount to be paid.',
                     'date to be paid cannot be before the date loaned.': 'Date to be paid cannot be before the date loaned.',
                     'product not found.': 'Product not found.', 'all fields are required.': 'All fields are required.',
+                    'unit must be kg, piece, or bag.': 'Unit must be kg, piece, or bag.',
                     'selling price must be greater than cost price.': 'Selling price must be greater than cost price.',
                     'product added successfully.': 'Product added successfully.', 'product updated successfully.': 'Product updated successfully.',
                     'product deleted. sales history preserved.': 'Product deleted. Sales history preserved.',
@@ -628,6 +650,7 @@
                     'amount paid cannot exceed the amount to be paid.': 'Kiasi kilicholipwa hakiwezi kuzidi kiasi cha kulipwa.',
                     'date to be paid cannot be before the date loaned.': 'Tarehe ya kulipa haiwezi kuwa kabla ya tarehe ya kukopa.',
                     'product not found.': 'Bidhaa haikupatikana.', 'all fields are required.': 'Sehemu zote zinahitajika.',
+                    'unit must be kg, piece, or bag.': 'Kipimo lazima kiwe kg, kipande au mfuko.',
                     'selling price must be greater than cost price.': 'Bei ya kuuza lazima izidi bei ya kununua.',
                     'product added successfully.': 'Bidhaa imeongezwa kikamilifu.', 'product updated successfully.': 'Taarifa za bidhaa zimesasishwa kikamilifu.',
                     'product deleted. sales history preserved.': 'Bidhaa imefutwa. Historia ya mauzo imehifadhiwa.',
@@ -645,6 +668,21 @@
         function t(key, values = {}) {
             const template = translations[currentLanguage][key] || translations.en[key] || key;
             return template.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '');
+        }
+
+        function unitLabel(unitType) {
+            const key = { kg: 'unitKg', piece: 'unitPieces', bag: 'unitBags' }[unitType] || 'unitPieces';
+            return t(key);
+        }
+
+        function unitPriceLabel(unitType) {
+            const key = { kg: 'unitKg', piece: 'unitPieceSingular', bag: 'unitBagSingular' }[unitType] || 'unitPieceSingular';
+            return t(key);
+        }
+
+        function currentSaleUnit() {
+            const dropdown = document.getElementById('saleProduct');
+            return unitPriceLabel(dropdown?.options[dropdown.selectedIndex]?.dataset.unitType || 'piece');
         }
 
         function translateRenderedMessage(message, fromLang, toLang) {
@@ -670,10 +708,19 @@
             const known = errorTranslations[lang].messages[normalized];
             if (known) return known;
 
-            let match = raw.match(/^Not enough stock\. Only ([\d,.]+) unit\(s\) available\.$/i);
+            const serverUnitLabel = value => {
+                const unit = value.toLowerCase();
+                if (lang !== 'sw') return unit === 'unit(s)' ? 'units' : unit;
+                return unit === 'kg' ? 'kg' : unit === 'bag' ? 'mfuko' : unit === 'bags' ? 'mifuko' : 'vipande';
+            };
+            let match = raw.match(/^Not enough stock\. Only ([\d,.]+) (kg|pieces|bags|unit\(s\)) available\.$/i);
             if (match) return lang === 'sw'
-                ? `Stoo haina bidhaa za kutosha. Vilivyopo ni vipande ${match[1]} pekee.`
-                : `Not enough stock. Only ${match[1]} unit(s) available.`;
+                ? `Stoo haina bidhaa za kutosha. Vilivyopo ni ${match[1]} ${serverUnitLabel(match[2])} pekee.`
+                : `Not enough stock. Only ${match[1]} ${serverUnitLabel(match[2])} available.`;
+            match = raw.match(/^Cannot sell a quantity below the set price of ([\d,.]+) per (kg|piece|pieces|bag|bags)\.$/i);
+            if (match) return lang === 'sw'
+                ? `Bei haiwezi kuwa chini ya Tsh ${match[1]} kwa ${serverUnitLabel(match[2])}.`
+                : `Cannot sell below the set price of Tsh ${match[1]} per ${serverUnitLabel(match[2])}.`;
             match = raw.match(/^Cannot sell a single unit below the set price of ([\d,.]+)\.$/i);
             if (match) return lang === 'sw'
                 ? `Kipande kimoja hakiwezi kuuzwa chini ya bei iliyowekwa ya Tsh ${match[1]}.`
@@ -682,14 +729,14 @@
             if (match) return lang === 'sw'
                 ? `⚠️ Onyo: "${match[1]}" kimefikia au kimeshuka chini ya kiwango cha chini cha stoo!`
                 : `⚠️ Warning: "${match[1]}" is already at or below the minimum stock limit!`;
-            match = raw.match(/^(?:⚠️\s*)?Restock Alert: "(.+)" is running low — only ([\d,.]+) unit\(s\) remaining!$/i);
+            match = raw.match(/^(?:⚠️\s*)?Restock Alert: "(.+)" is running low — only ([\d,.]+) (kg|pieces|bags|unit\(s\)) remaining!$/i);
             if (match) return lang === 'sw'
-                ? `⚠️ Onyo la kuongeza stoo: "${match[1]}" kinakaribia kuisha — vimebaki vipande ${match[2]} pekee!`
-                : `⚠️ Restock alert: "${match[1]}" is running low — only ${match[2]} unit(s) remaining!`;
-            match = raw.match(/^(?:⚠️\s*)?Restock Alert: "(.+)" has only ([\d,.]+) unit\(s\) left\. Minimum is ([\d,.]+)\.$/i);
+                ? `⚠️ Onyo la kuongeza stoo: "${match[1]}" kinakaribia kuisha — vimebaki ${match[2]} ${serverUnitLabel(match[3])} pekee!`
+                : `⚠️ Restock alert: "${match[1]}" is running low — only ${match[2]} ${serverUnitLabel(match[3])} remaining!`;
+            match = raw.match(/^(?:⚠️\s*)?Restock Alert: "(.+)" has only ([\d,.]+) (kg|pieces|bags|unit\(s\)) left\. Minimum is ([\d,.]+)\.$/i);
             if (match) return lang === 'sw'
-                ? `⚠️ Onyo la kuongeza stoo: "${match[1]}" kimebaki na vipande ${match[2]}. Kiwango cha chini ni ${match[3]}.`
-                : `⚠️ Restock alert: "${match[1]}" has only ${match[2]} unit(s) left. Minimum is ${match[3]}.`;
+                ? `⚠️ Onyo la kuongeza stoo: "${match[1]}" kimebaki na ${match[2]} ${serverUnitLabel(match[3])}. Kiwango cha chini ni ${match[4]}.`
+                : `⚠️ Restock alert: "${match[1]}" has only ${match[2]} ${serverUnitLabel(match[3])} left. Minimum is ${match[4]}.`;
             match = raw.match(/^⚠️\s*(\d+) product\(s\) need restocking!$/i);
             if (match) return lang === 'sw' ? `⚠️ Bidhaa ${match[1]} zinahitaji kuongezwa stooni!` : `⚠️ ${match[1]} product(s) need restocking!`;
             match = raw.match(/^⏰\s*(\d+) loan repayment\(s\) due tomorrow\.$/i);
@@ -717,6 +764,8 @@
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const values = { ...element.dataset };
                 delete values.i18n;
+                if (values.unitType) values.unit = unitLabel(values.unitType);
+                else if (['actualSellingPrice', 'minPerUnit'].includes(element.dataset.i18n)) values.unit = currentSaleUnit();
                 element.textContent = t(element.dataset.i18n, values);
             });
             document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
@@ -922,11 +971,12 @@
             }
             products.forEach(p => {
                 const isLow = p.status === 'Low Stock';
+                const unitType = p.unit_type || 'piece';
                 if (isLow) criticalItems.push(p.name);
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="border-b hover:bg-gray-50">
                         <td class="p-3 font-medium">${p.name}</td>
-                        <td class="p-3"><span data-i18n="unitsCount" data-count="${p.stock_quantity}">${t('unitsCount', { count: p.stock_quantity })}</span></td>
+                        <td class="p-3"><span data-i18n="quantityCount" data-count="${p.stock_quantity}" data-unit-type="${unitType}">${t('quantityCount', { count: p.stock_quantity, unit: unitLabel(unitType) })}</span></td>
                         ${currentUser.role === 'admin' ? `<td class="p-3 text-gray-500">${tshs(p.cost_price)}</td>` : ''}
                         <td class="p-3 font-semibold">${tshs(p.selling_price)}</td>
                         <td class="p-3"><span data-i18n="${isLow ? 'lowStock' : 'good'}" class="px-2 py-1 text-xs rounded-full font-bold ${isLow ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">${isLow ? t('lowStock') : t('good')}</span></td>
@@ -949,7 +999,8 @@
             const dropdown = document.getElementById('saleProduct');
             dropdown.innerHTML = '';
             if (products) products.forEach(p => {
-                dropdown.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-price="${p.selling_price}" data-i18n="productMinOption" data-name="${p.name}" data-display-price="${tshs(p.selling_price)}">${t('productMinOption', { name: p.name, displayPrice: tshs(p.selling_price) })}</option>`);
+                const unitType = p.unit_type || 'piece';
+                dropdown.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-price="${p.selling_price}" data-unit-type="${unitType}" data-i18n="productMinOption" data-name="${p.name}" data-display-price="${tshs(p.selling_price)}">${t('productMinOption', { name: p.name, unit: unitLabel(unitType), displayPrice: tshs(p.selling_price) })}</option>`);
             });
             // Set initial min price
             if(typeof updateMinPrice==='function') updateMinPrice();
@@ -959,21 +1010,37 @@
             const dropdown = document.getElementById('restockProduct');
             dropdown.innerHTML = `<option value="" data-i18n="selectProduct">-- ${t('selectProduct')} --</option>`;
             if (products) products.forEach(p => {
-                dropdown.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-stock="${p.stock_quantity}" data-i18n="productStockOption" data-name="${p.name}" data-count="${p.stock_quantity}">${t('productStockOption', { name: p.name, count: p.stock_quantity })}</option>`);
+                const unitType = p.unit_type || 'piece';
+                dropdown.insertAdjacentHTML('beforeend', `<option value="${p.id}" data-stock="${p.stock_quantity}" data-unit-type="${unitType}" data-i18n="productStockOption" data-name="${p.name}" data-count="${p.stock_quantity}">${t('productStockOption', { name: p.name, count: p.stock_quantity, unit: unitLabel(unitType) })}</option>`);
             });
             dropdown.addEventListener('change', function() {
                 const selected = this.options[this.selectedIndex];
                 const stock = selected.dataset.stock || '—';
+                const unitType = selected.dataset.unitType || 'piece';
+                document.getElementById('restockUnit').value = unitType;
                 const display = document.getElementById('currentStockDisplay');
                 if (stock !== '—') {
-                    display.dataset.i18n = 'unitsCount';
+                    display.dataset.i18n = 'quantityCount';
                     display.dataset.count = stock;
-                    display.textContent = t('unitsCount', { count: stock });
+                    display.dataset.unitType = unitType;
+                    display.textContent = t('quantityCount', { count: stock, unit: unitLabel(unitType) });
                 } else {
                     display.removeAttribute('data-i18n');
                     display.removeAttribute('data-count');
+                    display.removeAttribute('data-unit-type');
                     display.textContent = '—';
                 }
+            });
+        }
+
+        function updateRestockUnitPreview() {
+            const display = document.getElementById('currentStockDisplay');
+            if (!display.dataset.count) return;
+            const unitType = document.getElementById('restockUnit').value;
+            display.dataset.unitType = unitType;
+            display.textContent = t('quantityCount', {
+                count: display.dataset.count,
+                unit: unitLabel(unitType)
             });
         }
 
@@ -993,7 +1060,10 @@
             const quantity_sold = parseFloat(document.getElementById('saleQty').value || 0);
             const sale_price = parseFloat(document.getElementById('salePriceOverride').value);
             const dropdown = document.getElementById('saleProduct');
-            const min_price = parseFloat(dropdown.options[dropdown.selectedIndex].dataset.price);
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            const selectedUnitType = selectedOption.dataset.unitType || 'piece';
+            const selectedUnit = unitPriceLabel(selectedUnitType);
+            const min_price = parseFloat(selectedOption.dataset.price);
             const btn = document.getElementById('saleBtn');
 
             // Validate quantity > 0
@@ -1005,7 +1075,7 @@
             // Validate price not below quarter of admin minimum
             const min_allowed = parseFloat((min_price * 0.25).toFixed(2));
             if (sale_price < min_allowed) {
-                showToast(t('salePriceError', { amount: tshs(min_allowed) }), true);
+                showToast(t('salePriceError', { amount: tshs(min_allowed), unit: selectedUnit }), true);
                 return;
             }
 
@@ -1047,10 +1117,11 @@
             try {
                 const data = await apiFetch('/sales', { method: 'POST', body: JSON.stringify(payload) });
                 if (paymentType === 'loan') {
-                    showToast(t('loanSaleRecorded', { quantity: quantity_sold, customer: payload.customer_name }));
+                    showToast(t('loanSaleRecorded', { quantity: quantity_sold, unit: selectedUnit, customer: payload.customer_name }));
                 } else {
                     showToast(t('saleRecorded', {
                         quantity: quantity_sold,
+                        unit: selectedUnit,
                         price: tshs(sale_price),
                         discount: discount > 0 ? t('discountDetail', { amount: tshs(discount) }) : '',
                         total: tshs(total_amount)
@@ -1083,10 +1154,11 @@
             const selling_price = parseFloat(document.getElementById('prodPrice').value);
             const stock_quantity = parseInt(document.getElementById('prodQty').value);
             const min_stock_limit = parseInt(document.getElementById('prodMin').value);
+            const unit_type = document.getElementById('prodUnit').value;
             const btn = document.getElementById('prodBtn');
             btn.textContent = t('saving'); btn.disabled = true;
             try {
-                await apiFetch('/products', { method: 'POST', body: JSON.stringify({ name, cost_price, selling_price, stock_quantity, min_stock_limit }) });
+                await apiFetch('/products', { method: 'POST', body: JSON.stringify({ name, cost_price, selling_price, stock_quantity, min_stock_limit, unit_type }) });
                 showToast(t('productAdded', { name }));
                 document.getElementById('productForm').reset();
                 await loadInventory();
@@ -1105,18 +1177,22 @@
             const addQty = parseInt(document.getElementById('restockQty').value);
             const newCost = document.getElementById('restockCost').value;
             const newPrice = document.getElementById('restockPrice').value;
+            const unitType = document.getElementById('restockUnit').value;
             const btn = document.getElementById('restockBtn');
             if (!product_id) { showToast(t('selectProductError'), true); return; }
 
             const product = allProducts.find(p => p.id == product_id);
+            const oldUnitType = product.unit_type || 'piece';
+            const unitChanged = unitType !== oldUnitType;
+            if (unitChanged && !confirm(t('unitChangeConfirm', { name: product.name }))) return;
             const new_stock = product.stock_quantity + addQty;
 
             // Build update payload
-            const payload = { stock_quantity: new_stock };
+            const payload = { stock_quantity: new_stock, unit_type: unitType };
             if (newCost !== '') payload.cost_price = parseFloat(newCost);
             if (newPrice !== '') payload.selling_price = parseFloat(newPrice);
 
-            if (addQty === 0 && newCost === '' && newPrice === '') {
+            if (addQty === 0 && newCost === '' && newPrice === '' && !unitChanged) {
                 showToast(t('updateStockError'), true);
                 return;
             }
@@ -1125,14 +1201,16 @@
             try {
                 await apiFetch(`/products/${product_id}`, { method: 'PUT', body: JSON.stringify(payload) });
                 let msg = '';
-                if (addQty > 0 && (newCost || newPrice)) msg = t('stockAddedAndPrices', { quantity: addQty, name: product.name });
-                else if (addQty > 0) msg = t('stockAdded', { quantity: addQty, name: product.name, stock: new_stock });
+                if (addQty > 0 && (newCost || newPrice)) msg = t('stockAddedAndPrices', { quantity: addQty, unit: unitLabel(unitType), name: product.name });
+                else if (addQty > 0) msg = t('stockAdded', { quantity: addQty, unit: unitLabel(unitType), name: product.name, stock: new_stock });
+                else if (unitChanged) msg = t('unitUpdated', { name: product.name, unit: unitLabel(unitType) });
                 else msg = t('pricesUpdated', { name: product.name });
                 showToast(msg);
                 document.getElementById('restockForm').reset();
                 const stockDisplay = document.getElementById('currentStockDisplay');
                 stockDisplay.removeAttribute('data-i18n');
                 stockDisplay.removeAttribute('data-count');
+                stockDisplay.removeAttribute('data-unit-type');
                 stockDisplay.textContent = '—';
                 await loadInventory();
                 await loadDashboardStats();
@@ -1460,6 +1538,18 @@
             }
         }
 
+        function formatReportQuantityTotals(summary) {
+            const totals = summary.quantity_by_unit;
+            if (!totals) return t('quantityCount', { count: summary.total_units_sold || 0, unit: unitLabel('piece') });
+            return [
+                ['kg', totals.kg],
+                ['piece', totals.pieces],
+                ['bag', totals.bags]
+            ].filter(([, count]) => Number(count) > 0)
+                .map(([unitType, count]) => t('quantityCount', { count, unit: unitLabel(unitType) }))
+                .join(', ') || t('zeroQuantity');
+        }
+
         function renderReportOutput(data, title) {
             const output = document.getElementById('reportOutput');
             const s = data.summary;
@@ -1467,7 +1557,7 @@
                 <strong class="text-gray-800">${title}</strong>
                 <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
                     <div class="bg-white border rounded p-2"><p class="text-gray-500 text-xs" data-i18n="transactions">${t('transactions')}</p><p class="font-bold">${s.total_transactions||0}</p></div>
-                    <div class="bg-white border rounded p-2"><p class="text-gray-500 text-xs" data-i18n="unitsSold">${t('unitsSold')}</p><p class="font-bold">${s.total_units_sold||0}</p></div>
+                    <div class="bg-white border rounded p-2"><p class="text-gray-500 text-xs" data-i18n="unitsSold">${t('unitsSold')}</p><p class="font-bold">${formatReportQuantityTotals(s)}</p></div>
                     <div class="bg-white border rounded p-2"><p class="text-gray-500 text-xs" data-i18n="revenue">${t('revenue')}</p><p class="font-bold text-emerald-700">${tshs(s.total_revenue||0)}</p></div>
                     <div class="bg-white border rounded p-2"><p class="text-gray-500 text-xs" data-i18n="profit">${t('profit')}</p><p class="font-bold text-indigo-700">${tshs(s.total_profit||0)}</p></div>
                 </div>
@@ -1477,7 +1567,7 @@
                     ${data.by_product.map(p => `
                         <div class="flex justify-between text-xs py-1 border-b">
                             <span>${p.product||t('deletedProduct')}</span>
-                            <span class="text-gray-500"><span data-i18n="unitsCount" data-count="${p.units_sold}">${t('unitsCount', { count: p.units_sold })}</span> — ${tshs(p.revenue)}</span>
+                            <span class="text-gray-500"><span data-i18n="quantityCount" data-count="${p.units_sold}" data-unit-type="${p.unit_type || 'piece'}">${t('quantityCount', { count: p.units_sold, unit: unitLabel(p.unit_type || 'piece') })}</span> — ${tshs(p.revenue)}</span>
                         </div>`).join('')}
                 </div>` : `<p class="mt-2 text-xs text-gray-400" data-i18n="noSalesPeriod">${t('noSalesPeriod')}</p>`}`;
         }
@@ -1504,6 +1594,9 @@
             const selected = dropdown.options[dropdown.selectedIndex];
             const price = selected.dataset.price;
             if (price) {
+                const unit = unitPriceLabel(selected.dataset.unitType || 'piece');
+                document.querySelector('[data-i18n="actualSellingPrice"]').textContent = t('actualSellingPrice', { unit });
+                document.querySelector('[data-i18n="minPerUnit"]').textContent = t('minPerUnit', { unit });
                 document.getElementById('minPriceDisplay').textContent = tshs(price);
                 const priceInput = document.getElementById('salePriceOverride');
                 if (priceInput) {
@@ -1543,6 +1636,9 @@
             const fracLabel = selectedFrac === 0 ? '' : selectedFrac === 0.5 ? '½' : selectedFrac === 0.25 ? '¼' : '¾';
             const display = document.getElementById('qtyDisplay');
             if(display) {
+                const dropdown = document.getElementById('saleProduct');
+                const unitType = dropdown?.options[dropdown.selectedIndex]?.dataset.unitType || 'piece';
+                const unit = unitLabel(unitType);
                 if(total === 0) {
                     display.dataset.i18n = 'quantityHint';
                     display.textContent = t('quantityHint');
@@ -1552,7 +1648,8 @@
                     display.dataset.whole = whole > 0 ? whole : '';
                     display.dataset.fraction = fracLabel;
                     display.dataset.total = total;
-                    display.textContent = t('quantityBreakdown', { whole: whole > 0 ? whole : '', fraction: fracLabel, total });
+                    display.dataset.unitType = unitType;
+                    display.textContent = t('quantityBreakdown', { whole: whole > 0 ? whole : '', fraction: fracLabel, total, unit });
                     display.className = 'text-xs font-medium text-indigo-600 mt-1';
                 }
             }
@@ -1567,6 +1664,8 @@
             const qty = parseFloat(document.getElementById('saleQty')?.value || 0);
             const enteredPrice = parseFloat(document.getElementById('salePriceOverride')?.value || unitPrice);
             const discount = parseFloat(document.getElementById('saleDiscount')?.value || 0);
+            const unitType = selected.dataset.unitType || 'piece';
+            const unit = unitPriceLabel(unitType);
 
             if (qty > 0 && unitPrice > 0 && enteredPrice > 0) {
                 const subtotal = parseFloat((enteredPrice * qty).toFixed(2));
@@ -1578,9 +1677,10 @@
                     calcDiv.classList.remove('hidden');
                     calcBreakdown.dataset.i18n = 'pricePerUnit';
                     calcBreakdown.dataset.quantity = qty;
-                    calcBreakdown.dataset.price = `${tshs(enteredPrice)} ${t('perUnit')}`;
+                    calcBreakdown.dataset.unitType = unitType;
+                    calcBreakdown.dataset.price = tshs(enteredPrice);
                     calcBreakdown.dataset.total = tshs(subtotal);
-                    calcBreakdown.textContent = t('pricePerUnit', { quantity: qty, price: `${tshs(enteredPrice)} ${t('perUnit')}`, total: tshs(subtotal) });
+                    calcBreakdown.textContent = t('pricePerUnit', { quantity: qty, price: tshs(enteredPrice), unit, total: tshs(subtotal) });
                 }
 
                 const finalDiv = document.getElementById('finalTotalDisplay');
