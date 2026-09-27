@@ -1,8 +1,8 @@
-const CACHE_NAME = 'sales-tracker-shell-v2';
+const CACHE_NAME = 'sales-tracker-shell-v3';
 const APP_SHELL = [
   './index.html',
   './manifest.json',
-  './index_files/saved_resource',
+  './index_files/saved_resource.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
